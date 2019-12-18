@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 const Conta = new mongoose.Schema({
     saldo: {
-        type: Number,
+        type: mongoose.Decimal128,
         required: true
     },
     ativos: {
