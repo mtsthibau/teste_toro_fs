@@ -24,11 +24,12 @@ class ContaController {
     async aporte(req, res) {
         try {
 
-            if (!req.body.valor || !Number.isInteger(req.body.valor)) {
+            if (!req.body.valor || !Number.isFinite(req.body.valor)) {
                 return res.status(400).send('JSON inválido')
             }
 
             const conta = await Conta.findById(req.params.id)
+            console.log(req.body.valor)
             conta.saldo += req.body.valor
             const contaR = await conta.updateOne(conta)
 
@@ -42,7 +43,7 @@ class ContaController {
     async retirada(req, res) {
         try {
 
-            if (!req.body.valor || !Number.isInteger(req.body.valor)) {
+            if (!req.body.valor || !Number.isFinite(req.body.valor)) {
                 return res.status(400).send('JSON inválido')
             }
 
@@ -65,7 +66,7 @@ class ContaController {
     async compraAtivo(req, res) {
         try {
 
-            if (!req.body.valor || !Number.isInteger(req.body.valor) || !req.body.codigo) {
+            if (!req.body.valor || !Number.isFinite(req.body.valor) || !req.body.codigo) {
                 return res.status(400).send('JSON inválido')
             }
 
@@ -100,12 +101,18 @@ class ContaController {
             }
 
             const conta = await Conta.findById(req.params.id)
-            const ativo = conta.ativos.filter((a) => a.id == req.body.ativo)
-            conta.ativos.splice(conta.ativos.indexOf(ativo));
-            conta.saldo += ativo.valor
+
+            conta.ativos.forEach((element, index) => {
+                if (req.body.ativo == element.id) {
+                    conta.ativos.splice(index);
+                    conta.saldo += element.valor
+                }
+            });
+
             await conta.save()
 
-            return res.json(ativo)
+            return res.json(conta)
+
         } catch (e) {
             return res.status(400).send('JSON inválido')
         }
